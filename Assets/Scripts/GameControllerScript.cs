@@ -73,6 +73,14 @@ public class GameControllerScript : MonoBehaviour
 		}
 	}
 
+	private void Update()
+	{
+		if (Application.platform != RuntimePlatform.WebGLPlayer && Input.GetButtonDown("Exit"))
+		{
+			Application.Quit();
+		}
+	}
+
 	private void CreateDust(Vector2 pos)
 	{
 		SpeckScript newDust = Instantiate(dustPrefab, pos, Quaternion.identity, GameObject.Find("Specks").transform).GetComponent<SpeckScript>();
