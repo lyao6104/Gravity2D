@@ -6,6 +6,9 @@ public class GameControllerScript : MonoBehaviour
 {
 	public GameObject dustPrefab;
 	public List<SpeckScript> dustSpecks;
+	public SpriteRenderer backgroundSprite;
+	public Color noCollideColour, collideColour;
+	public bool enableDustCollisions;
 
 	public float speckSpawnRadius = 1f;
 	public float gravitationalConstant = 6.674e-11f;
@@ -17,6 +20,17 @@ public class GameControllerScript : MonoBehaviour
 	{
 		Time.fixedDeltaTime = 0.05f;
 		Application.targetFrameRate = 60;
+		backgroundSprite = GameObject.Find("Background").GetComponent<SpriteRenderer>();
+		if (enableDustCollisions)
+		{
+			backgroundSprite.color = collideColour;
+		}
+		else
+		{
+			backgroundSprite.color = noCollideColour;
+		}
+		ToggleCollisionMode();
+		Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Specks"), LayerMask.NameToLayer("Specks"), !enableDustCollisions);
 	}
 
 	private void FixedUpdate()
@@ -78,6 +92,37 @@ public class GameControllerScript : MonoBehaviour
 		if (Application.platform != RuntimePlatform.WebGLPlayer && Input.GetButtonDown("Exit"))
 		{
 			Application.Quit();
+		}
+		else if (Input.GetButtonDown("ToggleCollide"))
+		{
+			if (enableDustCollisions)
+			{
+				enableDustCollisions = false;
+				backgroundSprite.color = noCollideColour;
+			}
+			else
+			{
+				enableDustCollisions = true;
+				backgroundSprite.color = collideColour;
+			}
+			ToggleCollisionMode();
+			Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Specks"), LayerMask.NameToLayer("Specks"), !enableDustCollisions);
+		}
+	}
+
+	// This is done because, when collisions are toggled, there's a chance that specks will go flying through the background barrier.
+	private void ToggleCollisionMode()
+	{
+		for (int i = 0; i < dustSpecks.Count; i++)
+		{
+			if (enableDustCollisions)
+			{
+				dustSpecks[i].GetComponent<Rigidbody2D>().collisionDetectionMode = CollisionDetectionMode2D.Discrete;
+			}
+			else
+			{
+				dustSpecks[i].GetComponent<Rigidbody2D>().collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+			}
 		}
 	}
 
