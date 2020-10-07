@@ -30,9 +30,9 @@ public class GameControllerScript : MonoBehaviour
 		Application.targetFrameRate = 60;
 		GameObject bgObject = GameObject.Find("Background");
 		backgroundSprite = bgObject.GetComponent<SpriteRenderer>();
-		speckSpawnBounds = bgObject.GetComponent<Collider2D>().bounds;
-		float edgeRadius = bgObject.GetComponent<EdgeCollider2D>().edgeRadius;
-		speckSpawnBounds.Expand(new Vector3(-edgeRadius, -edgeRadius)); // Shrink the bounds by the edge radius
+		speckSpawnBounds = bgObject.GetComponent<EdgeCollider2D>().bounds;
+		float edgeDiameter = 2 * bgObject.GetComponent<EdgeCollider2D>().edgeRadius;
+		speckSpawnBounds.Expand(new Vector3(-edgeDiameter, -edgeDiameter)); // Shrink the bounds by the edge radius
 		radiusRenderer = GetComponent<LineRenderer>();
 		if (enableDustCollisions)
 		{
@@ -87,14 +87,14 @@ public class GameControllerScript : MonoBehaviour
 			{
 				Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
-				if (!speckSpawnBounds.Contains(mousePos))
-				{
-					return;
-				}
-
 				float offsetX = Random.Range(-speckSpawnRadius, speckSpawnRadius);
 				float offsetY = Random.Range(-speckSpawnRadius, speckSpawnRadius);
 				Vector2 spawnPos = new Vector2(mousePos.x + offsetX, mousePos.y + offsetY);
+
+				if (!speckSpawnBounds.Contains(spawnPos))
+				{
+					return;
+				}
 
 				CreateDust(spawnPos);
 			}
@@ -104,14 +104,14 @@ public class GameControllerScript : MonoBehaviour
 				{
 					Vector2 touchPos = Camera.main.ScreenToWorldPoint(touch.position);
 
-					if (!speckSpawnBounds.Contains(touchPos))
-					{
-						continue;
-					}
-
 					float offsetX = Random.Range(-speckSpawnRadius, speckSpawnRadius);
 					float offsetY = Random.Range(-speckSpawnRadius, speckSpawnRadius);
 					Vector2 spawnPos = new Vector2(touchPos.x + offsetX, touchPos.y + offsetY);
+
+					if (!speckSpawnBounds.Contains(spawnPos))
+					{
+						return;
+					}
 
 					CreateDust(spawnPos);
 				}
